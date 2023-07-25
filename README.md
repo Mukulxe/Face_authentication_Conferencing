@@ -1,16 +1,2 @@
 # projectapp
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The primary objective of this project is to enhance security measures by implementing a user authentication system. The system utilizes image comparison techniques to verify the user's identity by comparing their provided image with the backend reference image. Once the user's identity is successfully authenticated, they will be granted access to enter the meeting. This security measure ensures that only authorized individuals can participate in the meeting, thereby safeguarding sensitive information and promoting a secure environment for all attendees.
