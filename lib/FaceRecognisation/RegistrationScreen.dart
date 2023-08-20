@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -6,13 +7,14 @@ import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
-import 'package:projectapp/RecognitionScreen.dart';
+import 'package:projectapp/FaceRecognisation/RecognitionScreen.dart';
 import 'package:projectapp/uploadingregisteruserscreen.dart';
-import 'HomeScreen.dart';
-import 'ML/Recognition.dart';
-import 'ML/Recognizer.dart';
-import 'package:projectapp/RegistrationScreen.dart';
-import 'package:projectapp/RecognitionScreen.dart';
+import 'Face_homescreen.dart';
+import '../ML/Recognition.dart';
+import '../ML/Recognizer.dart';
+import 'package:projectapp/FaceRecognisation/RegistrationScreen.dart';
+import 'package:projectapp/FaceRecognisation/RecognitionScreen.dart';
+import 'package:projectapp/FaceRecognisation/Face_homescreen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -20,59 +22,65 @@ class RegistrationScreen extends StatefulWidget {
   @override
   State<RegistrationScreen> createState() => _HomePageState();
 }
+
 //----------------------------------------------------------------------------------------------------------------------
 //TODO declare variables
 late ImagePicker imagePicker;
-  File? _image;
-  var image;
-  List<Face> faces = [];
-  //TODO declare detector
-  dynamic faceDetector;
+File? _image;
+var image;
+List<Face> faces = [];
+//TODO declare detector
+dynamic faceDetector;
 
-  //TODO declare face recognizer
-  late Recognizer _recognizer;
-
+//TODO declare face recognizer
+late Recognizer _recognizer;
 
 //-------------------------------------------------------------------------------------------------------------------------------
 
 class _HomePageState extends State<RegistrationScreen> {
-String? imageName;
+  String? imageName;
 
 //-------------------------------------------------------------------------------------------------------------------------------
   Future<void> uploadImageAndSaveToDatabase() async {
- File? pickedFilee= await _imgFromGallery();
-  if (pickedFilee == null) {
-    SnackBar(content: Text('Image not found')); // Exit the function if no image was picked
+    File? pickedFilee = await _imgFromGallery();
+    if (pickedFilee == null) {
+      SnackBar(
+          content: Text(
+              'Image not found')); // Exit the function if no image was picked
+    }
+    File imageFile = File(pickedFilee!.path);
+    await doFaceDetection();
+
+    try {
+      // Step 1: Upload the image to Firebase Storage
+      Reference storageReference = FirebaseStorage.instance.ref().child(
+          'RegisterdImages/${DateTime.now().millisecondsSinceEpoch.toString()}.jpg');
+      TaskSnapshot taskSnapshot = await storageReference.putFile(imageFile);
+      //-------------------------------------------------------------------------------------------------------------------------------
+      // Step 2: Get the download URL of the uploaded image
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      // Step 3: Save the image data (including the download URL) to Firebase Realtime Database
+
+      // DatabaseReference databaseReference =
+      await FirebaseFirestore.instance
+          .collection('RegisterdImages')
+          .doc()
+          .set({'imageUrl': imageUrl});
+      // databaseReference.set(
+      //   ImageData(
+      //     imageUrl: imageUrl,
+      //     imageName: imageName!,
+      //   ).toJson(),
+      // );
+      print('Image uploaded and data saved successfully!');
+    } catch (e) {
+      // Handle any errors that occur during the upload and save process
+      print("Error uploading image to Firebase or saving data: $e");
+    }
   }
-  File imageFile = File(pickedFilee!.path);
-  await doFaceDetection();
+//-------------------------------------------------------------------------------------------------------------------------------------
 
-  try {
-    // Step 1: Upload the image to Firebase Storage
-    Reference storageReference =
-        FirebaseStorage.instance.ref().child('RegisterdImages/${DateTime.now().millisecondsSinceEpoch.toString()}.jpg');
-    TaskSnapshot taskSnapshot = await storageReference.putFile(imageFile);
-
-    // Step 2: Get the download URL of the uploaded image
-    String imageUrl = await taskSnapshot.ref.getDownloadURL();
-
-    // Step 3: Save the image data (including the download URL) to Firebase Realtime Database
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.reference().child('images');
-    databaseReference.push().set(
-      ImageData(
-        imageUrl: imageUrl,
-        imageName: imageName!,
-      ).toJson(),
-    );
-    print('Image uploaded and data saved successfully!');
-  } catch (e) {
-    // Handle any errors that occur during the upload and save process
-    print("Error uploading image to Firebase or saving data: $e");
-  }
-}
-//----------------------------------------------------------------------------------------------------------------------
-  
   @override
   void initState() {
     // TODO: implement initState
@@ -94,11 +102,15 @@ String? imageName;
 
   //TODO capture image using camera
   Future<File?> _imgFromCamera() async {
-    XFile? pickedFilee = await imagePicker.pickImage(source: ImageSource.camera);
+    XFile? pickedFilee =
+        await imagePicker.pickImage(source: ImageSource.camera);
     if (pickedFilee != null) {
       _image = File(pickedFilee.path);
-      return _image;
+      // return _image;
+      await doFaceDetection();
+     
     }
+ 
   }
 
   //TODO choose image using gallery
@@ -158,9 +170,11 @@ String? imageName;
           left.toInt(), top.toInt(), width.toInt(), height.toInt());
       final bytes = await File(cropedFace!.path).readAsBytes();
       final img.Image? faceImg = img.decodeImage(bytes);
-      Recognition recognition =
-          _recognizer.recognize(faceImg!, face.boundingBox);
 
+      //here it is sending the registerdImage to the recognizer-------------------------------------------------------------------------
+      Recognition recognition =
+          await _recognizer.recognize(faceImg!, face.boundingBox);
+//----------------------------------------------------------------------------------------------------------------------------------------
       //TODO show face registration dialogue
       showFaceRegistrationDialogue(cropedFace, recognition);
     }
@@ -201,7 +215,9 @@ String? imageName;
               ),
               ElevatedButton(
                   onPressed: () {
-                  imageName = textEditingController.text;
+                    Facehomescreen.registered.putIfAbsent(
+                        textEditingController.text, () => recognition);
+                    imageName = textEditingController.text;
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                       content: Text("Face Registered"),
@@ -266,7 +282,7 @@ String? imageName;
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const Startscreen()));
+                        builder: (context) => const Facehomescreen()));
                 print('sfsdg');
               },
               child: Text('press')),

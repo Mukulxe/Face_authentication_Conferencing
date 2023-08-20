@@ -1,8 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:projectapp/FaceRecognisation/Cropped_Provider.dart';
-import 'package:projectapp/HomeScreen.dart';
-import 'package:projectapp/RegistrationScreen.dart';
+import 'package:projectapp/FaceRecognisation/Face_homescreen.dart';
+import 'package:projectapp/FaceRecognisation/RegistrationScreen.dart';
 import 'package:projectapp/screens/homescree.dart';
 import 'package:projectapp/screens/meetingScreen.dart';
 import 'package:projectapp/utils/colors.dart';
@@ -11,7 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:projectapp/google_authentication/authentication.dart';
 import 'package:provider/provider.dart';
 
-import 'RecognitionScreen.dart';
+import 'FaceRecognisation/RecognitionScreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +42,7 @@ class MyApp extends StatelessWidget {
         // 'meetingscreen':(context) => MeetingScreen(),
         'home': (context) => Homescreen(),
         '/recognition': (context) => RecognitionScreen(),
-        '/recognition': (context) => Startscreen(),
+        '/recognition': (context) => Facehomescreen(),
         '/recognition': (context) => RegistrationScreen(),
       },
       home: StreamBuilder(

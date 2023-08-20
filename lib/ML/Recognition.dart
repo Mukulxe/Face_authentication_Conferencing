@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:projectapp/ML/Recognition.dart';
 import 'package:tflite_flutter_plus/tflite_flutter_plus.dart';
 
-import 'package:projectapp/RegistrationScreen.dart';
-import 'package:projectapp/RecognitionScreen.dart';
+import 'package:projectapp/FaceRecognisation/RegistrationScreen.dart';
+import 'package:projectapp/FaceRecognisation/RecognitionScreen.dart';
 
 class Recognition {
   String name;

@@ -62,7 +62,7 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
 
     await flutterLocalNotificationsPlugin.show(
       0, // Notification ID
-      'YE LE BETA', // Notification title
+      'Conference Code', // Notification title
       'Conference ID: $randomNumber\n\nGenerated at: $codeGeneratedDateTime', // Notification body
       platformChannelSpecifics,
     );

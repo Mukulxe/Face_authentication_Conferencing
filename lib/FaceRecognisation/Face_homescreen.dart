@@ -69,35 +69,37 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'ML/Recognition.dart';
+import '../ML/Recognition.dart';
 // import 'RecognitionScreen.dart';
 // import 'RegistrationScreen.dart';
 
-import 'package:projectapp/RegistrationScreen.dart';
-import 'package:projectapp/RecognitionScreen.dart';
+import 'package:projectapp/FaceRecognisation/RegistrationScreen.dart';
+import 'package:projectapp/FaceRecognisation/RecognitionScreen.dart';
+import 'package:projectapp/FaceRecognisation/Face_homescreen.dart';
 
-class Startscreen extends StatefulWidget {
-  const Startscreen({Key? key}) : super(key: key);
-  // static Map<String, Recognition> registered = Map();
+class Facehomescreen extends StatefulWidget {
+  const Facehomescreen({Key? key}) : super(key: key);
+  static Map<String, Recognition> registered = Map();
   @override
-  State<Startscreen> createState() => _HomePageState();
+  State<Facehomescreen> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<Startscreen> {
+class _HomePageState extends State<Facehomescreen> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-              margin: const EdgeInsets.only(top: 100),
-              child: Image.network(
-                " https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-                width: screenWidth-40,height: screenWidth-40,
-              )),
+          // Container(
+          //     margin: const EdgeInsets.only(top: 100),
+          //     child: Image.network(
+          //       " https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
+          //       width: screenWidth-40,height: screenWidth-40,
+          //     )
+          //     ),
           Container(
             margin: const EdgeInsets.only(bottom: 50),
             child: Column(
